@@ -36,12 +36,8 @@ module.exports = function(file, options) {
     options.signature = defaults.signature;
   }
 
-  // Add line returns to valid signatures.
-  if (typeof options.signature === 'string' && options.signature !== ''){
-    options.signature = options.signature + '\n\n';
-  }
   // Remove signature line when requested.
-  else if (options.signature === false) {
+  if (options.signature === false) {
     options.signature = '';
   }
 
@@ -52,8 +48,8 @@ module.exports = function(file, options) {
     quoteSymbol = '\'';
   }
 
-  // Begin with signature line, import statements will follow.
-  var imports = options.signature;
+  // Store import statements;
+  var imports = '';
 
   var bufferContents = function(file, encoding, callback) {
     // File source required.
@@ -80,7 +76,7 @@ module.exports = function(file, options) {
         }
 
         // Add import statement.
-        imports = imports + '@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';';
+        imports = imports + '@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';\n';
       }
 
       callback();
@@ -91,8 +87,27 @@ module.exports = function(file, options) {
     // globFile will contain import statements.
     var globFile = new File(file);
 
-    // Add import statements to glob file.
-    globFile.contents = new Buffer(imports);
+    // Begin with signature line, import statements will follow.
+    var filecontents = options.signature;
+    // Check if valid signature exists.
+    if (typeof options.signature === 'string' && options.signature !== ''){
+      // Provide single line break after signature if there are no imports.
+      if (imports === '') {
+        filecontents = filecontents + '\n';
+      }
+      // Provide dpuble line break after signature if there are imports.
+      else {
+        filecontents = filecontents + '\n\n' + imports;
+      }
+    }
+
+    // Ensure filecontents at least have a single line break.
+    if (filecontents === '') {
+      filecontents = '\n';
+    }
+
+    // Add import statements to glob file, ensure file ends with newline.
+    globFile.contents = new Buffer(filecontents);
 
     this.push(globFile);
     callback();
