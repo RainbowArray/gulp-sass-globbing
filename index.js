@@ -21,12 +21,13 @@ module.exports = function(file, options) {
   if (!file) {
     throw new PluginError('gulp-sass-globbing', 'Missing file option.');
   }
+
   options = options || {};
 
   // Merge options with these defaults.
   defaults = {
     useSingleQuotes: false,
-    signature: '/* generated with grunt-sass-globbing */'
+    signature: '/* generated with gulp-sass-globbing */'
   }
   if (!("useSingleQuotes" in options)) {
     options.useSingleQuotes = defaults.useSingleQuotes;
@@ -66,9 +67,8 @@ module.exports = function(file, options) {
       this.emit('error', new PluginError('gulp-sass-globbing', 'Streams not supported.'));
     }
     else if (file.isBuffer()) {
-      var ext = path.extname(file.path);
-
       // Check if this is a Sass file.
+      var ext = path.extname(file.path);
       if (ext.toLowerCase() == '.scss' || ext.toLowerCase() == '.sass') {
         // Remove the parent file base path from the path we will output.
         var filename = path.normalize(file.path);
@@ -83,19 +83,15 @@ module.exports = function(file, options) {
         imports = imports + '@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';';
       }
 
-      return callback(null, file);
+      callback();
     }
   };
 
   var endStream = function(callback) {
-    // No files passed in, no file goes out.
-    if (!imports) {
-      callback();
-      return;
-    }
-
-    // Create globbed file with import statements.
+    // globFile will contain import statements.
     var globFile = new File(file);
+
+    // Add import statements to glob file.
     globFile.contents = new Buffer(imports);
 
     this.push(globFile);
