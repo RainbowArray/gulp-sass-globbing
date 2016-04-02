@@ -1,6 +1,6 @@
 {
   "name": "gulp-sass-globbing",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "@import file map creation for Sass",
   "main": "index.js",
   "repository": {
