@@ -10,11 +10,12 @@
  * Licensed under the MIT license.
  */
 
-var slash = require('slash'),
-   path = require('path');
-   fs = require('fs');
-   through = require('through2');
-   glob = require('glob');
+var slash       = require('slash'),
+    path        = require('path');
+    through     = require('through2');
+    gutil       = require('gulp-util'),
+    PluginError = gutil.PluginError,
+    File        = gutil.File;
 
 module.exports = function(file, options) {
   if (!file) {
@@ -43,7 +44,10 @@ module.exports = function(file, options) {
     quoteSymbol = '\'';
   }
 
-  var transform = function(file, encoding, callback) {
+  // Begin with signature line, import statements will follow.
+  var imports = options.signature;
+
+  var bufferContents = function(file, encoding, callback) {
     // File source required.
     if (file.isNull()) {
       // nothing to do
@@ -55,10 +59,35 @@ module.exports = function(file, options) {
       this.emit('error', new PluginError(PLUGIN_NAME, 'Streams not supported.'));
     }
     else if (file.isBuffer()) {
+      // Check if this is a Sass file.
+      if (file.extname.toLowerCase() == '.scss' || file.extname.toLowerCase() == '.sass') {
+        // Remove the parent file base path from the path we will output.
+        var filename = path.normalize(file.path);
+        var base = path.join(path.normalize(file.base), '/');
+        filename = filename.replace(base, '');
+
+        // Add import statement.
+        imports = imports + '@import ' + quoteSymbol + slash(filename) + quoteSymbol;
+      }
 
       return callback(null, file);
     }
   };
 
-  return through.obj(transform);
+  var endStream(callback) {
+    // No files passed in, no file goes out.
+    if (!imports) {
+      callback();
+      return;
+    }
+
+    // Create globbed file with import statements.
+    var globFile = new File(file);
+    globFile.contents = imports;
+
+    this.push(globFile);
+    callback();
+  }
+
+  return through.obj(bufferContents, endStream);
 };
