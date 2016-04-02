@@ -19,7 +19,7 @@ var slash       = require('slash'),
 
 module.exports = function(file, options) {
   if (!file) {
-    throw new PluginError(PLUGIN_NAME, 'Missing file option.');
+    throw new PluginError('gulp-sass-globbing', 'Missing file option.');
   }
 
   // Merge options with these defaults.
@@ -56,7 +56,7 @@ module.exports = function(file, options) {
 
     // Complete files required, so streams are not supported.
     if (file.isStream()) {
-      this.emit('error', new PluginError(PLUGIN_NAME, 'Streams not supported.'));
+      this.emit('error', new PluginError('gulp-sass-globbing', 'Streams not supported.'));
     }
     else if (file.isBuffer()) {
       // Check if this is a Sass file.
