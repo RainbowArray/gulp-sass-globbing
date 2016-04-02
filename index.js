@@ -16,7 +16,33 @@ var slash = require('slash'),
    through = require('through2');
    glob = require('glob');
 
-module.exports = function() {
+module.exports = function(file, options) {
+  if (!file) {
+    throw new PluginError(PLUGIN_NAME, 'Missing file option.');
+  }
+
+  // Merge options with these defaults.
+  options = {
+    useSingleQuotes: false,
+    signature: '/* generated with grunt-sass-globbing */'
+  }
+
+  // Add line returns to valid signatures.
+  if (typeof options.signature === 'string' && options.signature !== ''){
+    options.signature = options.signature + '\n\n';
+  }
+  // Remove signature line when requested.
+  else if (options.signature === false) {
+    options.signature = '';
+  }
+
+  // Default to double quotes.
+  var quoteSymbol = '"';
+  // Use single quote if requested.
+  if (typeof options.useSingleQuotes !== 'undefined' && options.useSingleQuotes === true) {
+    quoteSymbol = '\'';
+  }
+
   var transform = function(file, encoding, callback) {
     // File source required.
     if (file.isNull()) {
