@@ -47,12 +47,12 @@ gulp.task('glob:sass', function() {
 
   gulp.src('components/**/*.scss', {cwd: 'sass/partials/global-styles'})
     .pipe(globSass(
-      file: {
+      {
         path: '_components.scss'
       },
-      options: {
-        'useSingleQuotes': true
-        'signature': '// Hello, World!'
+      {
+        useSingleQuotes: true
+        signature: '// Hello, World!'
       }
     ))
     .pipe(gulp.dest('sass/partials/global-styles'));
