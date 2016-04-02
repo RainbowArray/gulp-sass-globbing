@@ -1,0 +1,36 @@
+{
+  "name": "gulp-sass-globbing",
+  "version": "0.0.1",
+  "description": "@import file map creation for Sass",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mdrummond/gulp-sass-globbing.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "scss",
+    "sass",
+    "glob",
+    "import",
+    "directory",
+    "bulk",
+    "import"
+  ],
+  "author": "Marc Drummond",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mdrummond/gulp-sass-globbing/issues"
+  },
+  "homepage": "https://github.com/mdrummond/gulp-sass-globbing",
+  "dependencies": {
+    "gulp-util": "^3.0.7",
+    "path": "^0.12.7",
+    "slash": "^1.0.0",
+    "through2": "^2.0.1"
+  },
+  "devDependencies": {
+    "gulp-sass": "^1.3.3",
+    "vinyl-fs": "^0.3.14"
+  }
+}
