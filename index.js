@@ -21,11 +21,18 @@ module.exports = function(file, options) {
   if (!file) {
     throw new PluginError('gulp-sass-globbing', 'Missing file option.');
   }
+  options = options || {};
 
   // Merge options with these defaults.
-  options = {
+  defaults = {
     useSingleQuotes: false,
     signature: '/* generated with grunt-sass-globbing */'
+  }
+  if (!("useSingleQuotes" in options)) {
+    options.useSingleQuotes = defaults.useSingleQuotes;
+  }
+  if (!("signature" in options)) {
+    options.signature = defaults.signature;
   }
 
   // Add line returns to valid signatures.
@@ -59,22 +66,28 @@ module.exports = function(file, options) {
       this.emit('error', new PluginError('gulp-sass-globbing', 'Streams not supported.'));
     }
     else if (file.isBuffer()) {
+      var ext = path.extname(file.path);
+
       // Check if this is a Sass file.
-      if (file.extname.toLowerCase() == '.scss' || file.extname.toLowerCase() == '.sass') {
+      if (ext.toLowerCase() == '.scss' || ext.toLowerCase() == '.sass') {
         // Remove the parent file base path from the path we will output.
         var filename = path.normalize(file.path);
-        var base = path.join(path.normalize(file.base), '/');
-        filename = filename.replace(base, '');
+        var cwd = path.normalize(file.cwd);
+        var cwdfile = (filename.substr(filename.search(cwd))).replace(cwd, '');
+        var importname = (cwdfile.replace(/\.(scss|sass)$/, '')).replace('/_', '/');
+        if (importname.charAt(0) === '/') {
+          importname = importname.substr(1);
+        }
 
         // Add import statement.
-        imports = imports + '@import ' + quoteSymbol + slash(filename) + quoteSymbol;
+        imports = imports + '@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';';
       }
 
       return callback(null, file);
     }
   };
 
-  var endStream(callback) {
+  var endStream = function(callback) {
     // No files passed in, no file goes out.
     if (!imports) {
       callback();
@@ -83,7 +96,7 @@ module.exports = function(file, options) {
 
     // Create globbed file with import statements.
     var globFile = new File(file);
-    globFile.contents = imports;
+    globFile.contents = new Buffer(imports);
 
     this.push(globFile);
     callback();
