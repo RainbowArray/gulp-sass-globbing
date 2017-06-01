@@ -51,12 +51,12 @@ gulp.task('glob:sass', function() {
         path: '_components.scss'
       },
       {
-        useSingleQuotes: true
+        useSingleQuotes: true,
         signature: '// Hello, World!'
       }
     ))
     .pipe(gulp.dest('sass/partials/global-styles'));
-};
+});
 ```
 
 In the gulp.src command, define the path where the files should be globbed from,
@@ -81,7 +81,7 @@ Determines whether single or double quotes are used around import statements.
 
 #### signature
 Type: `string`
-Default: `/* generated with grunt-sass-globbing */\n\n`
+Default: `/* generated with gulp-sass-globbing */\n\n`
 
 Sets the signature for the map files.
 
