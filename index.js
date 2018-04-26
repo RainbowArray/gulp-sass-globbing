@@ -67,8 +67,9 @@ module.exports = function(file, options) {
       var ext = path.extname(file.path);
       if (ext.toLowerCase() == '.scss' || ext.toLowerCase() == '.sass') {
         // Remove the parent file base path from the path we will output.
-        var filename = path.normalize(file.path);
-        var cwd = path.normalize(file.cwd);
+        // Slash the file strings so the regex works in the string search on Windows
+        var filename = slash(path.normalize(file.path));
+        var cwd = slash(path.normalize(file.cwd));
         var cwdfile = (filename.substr(filename.search(cwd))).replace(cwd, '');
         var importname = (cwdfile.replace(/\.(scss|sass)$/, '')).replace('/_', '/');
         if (importname.charAt(0) === '/') {
