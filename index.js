@@ -49,7 +49,7 @@ module.exports = function(file, options) {
   }
 
   // Store import statements;
-  var imports = '';
+  var imports = [];
 
   var bufferContents = function(file, encoding, callback) {
     // File source required.
@@ -76,7 +76,7 @@ module.exports = function(file, options) {
         }
 
         // Add import statement.
-        imports = imports + '@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';\n';
+        imports.push('@import ' + quoteSymbol + slash(importname) + quoteSymbol + ';');
       }
 
       callback();
@@ -89,6 +89,11 @@ module.exports = function(file, options) {
 
     // Begin with signature line, import statements will follow.
     var filecontents = options.signature;
+
+    // bufferContents() is not always called with a consistent order. Sort
+    // imports so they are always in the same order.
+    imports.sort();
+
     // Check if valid signature exists.
     if (typeof options.signature === 'string' && options.signature !== ''){
       // Provide single line break after signature if there are no imports.
@@ -97,7 +102,7 @@ module.exports = function(file, options) {
       }
       // Provide dpuble line break after signature if there are imports.
       else {
-        filecontents = filecontents + '\n\n' + imports;
+        filecontents = filecontents + '\n\n' + imports.join('\n') + '\n';
       }
     }
 
@@ -111,7 +116,7 @@ module.exports = function(file, options) {
 
     this.push(globFile);
     callback();
-  }
+  };
 
   return through.obj(bufferContents, endStream);
 };
